@@ -167,7 +167,7 @@ async def remove_service(organization_id: int, service_id: int) -> None:
 
 
 @app.put("/organizations/{organization_id}/services/{service_id}/discounts", tags=["services"], response_model=Discount)
-async def remove_service(organization_id: int, service_id: int) -> Discount:
+async def add_discounts(organization_id: int, service_id: int) -> Discount:
     return None
 
 
