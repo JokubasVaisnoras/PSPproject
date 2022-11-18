@@ -10,23 +10,14 @@ tags_metadata = [
         "name": "services",
         "description": "Operations with services.",
     },
-]
-
-tags_metadata = [
     {
         "name": "manage_staff",
         "description": "Operations with staff management.",
     },
-]
-
-tags_metadata = [
     {
         "name": "manage_organizations",
         "description": "Operations with organization management.",
     },
-]
-
-tags_metadata = [
     {
         "name": "manage_shifts",
         "description": "Operations with shift management.",
@@ -49,35 +40,9 @@ class Transaction(BaseModel):
     created_timestamp: datetime.datetime
 
 
-class Order(BaseModel):
-    id: int
-    cust_id: int
-    tracking_code: int
-    status: int
-    note: str
-    # we use datetime since it is equivalent to timestamp
-    requested_timestamp: datetime.datetime
-    estimated_timestamp: datetime.datetime
-
-
 class DiscountTypes(str, Enum):
     percentage = "percentage"
     price = "price"
-
-
-class TransactionTypes(Enum):
-    cash = "cash"
-    card = "card"
-
-
-class Transaction(BaseModel):
-    id: int
-    emp_org_id: int
-    cust_id: int
-    order_id: int
-    amount: int
-    type: TransactionTypes
-    created_timestamp: datetime.datetime
 
 
 class Order(BaseModel):
@@ -89,11 +54,6 @@ class Order(BaseModel):
     # we use datetime since it is equivalent to timestamp
     requested_timestamp: datetime.datetime
     estimated_timestamp: datetime.datetime
-
-
-class DiscountTypes(str, Enum):
-    percentage = "percentage"
-    price = "price"
 
 
 class Organization(BaseModel):
@@ -133,22 +93,6 @@ class Shifts(BaseModel):
     created_timestamp: datetime.datetime
 
 
-class EmployeeOrganizations(BaseModel):
-    id: int
-    user_id: int
-    org_id: int
-    access: dict
-
-
-class Shifts(BaseModel):
-    id: int
-    emp_org_id: int
-    start_time: datetime.datetime
-    end_time: datetime.datetime
-    # Changing created_timestamp type from int to datetime
-    created_timestamp: datetime.datetime
-
-
 class OrderedService(BaseModel):
     id: int
     order_id: int
@@ -163,11 +107,6 @@ class Discount(BaseModel):
     exact_price: int
     created_timestamp: datetime.datetime
 
-
-# class Discount_coupon(Discount):
-#     coupon_id: int
-#     code: int
-#     created_timestamp: datetime.datetime
 
 class Coupon(Discount):
     coupon_id: int
@@ -242,36 +181,31 @@ async def check_information(customer_id: int) -> User:
     return None
 
 
-@app.put("/customers/{customer_id}/info", tags=["Customer"], response_model=User)
-async def update_information(customer_id: int) -> User:
-    return None
-
-
 @app.post("/employees/{employee_id}/update", tags=["Employee"], response_model=Employee)
 async def update_credentials(employee_id: int, new_employee: Employee) -> Censored_employee:
     return None
 
 
-@app.post("//organizations/{organization_id}/coupons/create", tags=["Coupons"], response_model=Discount)
+@app.post("/organizations/{organization_id}/coupons/create", tags=["Coupons"], response_model=Discount)
 async def create_coupon(organization_id: int, coupon: Discount) -> Discount:
     return None
 
 
-@app.post("//organizations/{organization_id}/coupons/{coupon_id}/modify", tags=["Coupons"], response_model=Discount)
+@app.post("/organizations/{organization_id}/coupons/{coupon_id}/modify", tags=["Coupons"], response_model=Discount)
 async def modify_coupon(organization_id: int, coupon_id: int, discount: DiscountTypes, amount: int) -> Discount:
     return None
 
 
-@app.post("//organizations/{organization_id}/coupons/{coupon_id}/assign", tags=["Coupons"], response_model=Coupon)
-async def assing_coupon(organization_id: int, coupon_id: int, customer_id: int, end_date: datetime.datetime) -> Coupon:
+@app.post("/organizations/{organization_id}/coupons/{coupon_id}/assign", tags=["Coupons"], response_model=Coupon)
+async def assign_coupon(organization_id: int, coupon_id: int, customer_id: int, end_date: datetime.datetime) -> Coupon:
     return None
 
 
-@app.get("//organizations/{organization_id}/order_history", tags=["Organization"], response_model=list[Order])
+@app.get("/organizations/{organization_id}/order_history", tags=["Organization"], response_model=list[Order])
 async def get_order_history(organization_id: int) -> list[Order]:
     return None
 
-app.get("//organizations/{organization_id}/order_history/{employee_id}",
+app.get("/organizations/{organization_id}/order_history/{employee_id}",
         tags=["Organization"], response_model=list[Order])
 
 
@@ -309,18 +243,8 @@ async def organization_add_opening_time(note: str = Body({"opening": 10, "closin
     return None
 
 
-@app.delete("/organizations/{organization_id}", tags=["manage_organizations"])
-async def delete_response():
-    return None
-
-
 @app.post("/organizations/{organization_id}/employees", tags=["manage_staff"], response_model=EmployeeOrganizations)
 async def staff_add_employee(note: str = Body({"id": 1, "user_id": 15, "org_id": 1337, "access": {"access1": True, "access2": False}})) -> Organization:
-    return None
-
-
-@app.delete("/organizations/{organization_id}/employees/{user_id}", tags=["manage_staff"])
-async def delete_response():
     return None
 
 
@@ -329,43 +253,13 @@ async def shifts_add_shift(note: str = Body({"id": 1, "emp_org_id": 55, "start_t
     return None
 
 
-@app.put("/organizations/{organization_id}/shifts/{shift_id}", tags=["manage_shifts"], response_model=Shifts)
-async def shifts_edit_shift_information(note: str = Body({"id": 0, "emp_org_id": 0})) -> Shifts:
-    return None
-
-
-@app.post("/organizations/{organization_id}/add_location", tags=["manage_organizations"], response_model=Organization)
-async def organization_add_location(note: str = Body({"location": "Test street 1"})) -> Organization:
-    return None
-
-
-@app.post("/organizations/{organization_id}/add_bank_credentials", tags=["manage_organizations"], response_model=Organization)
-async def organization_add_bank_data(note: str = Body({"account_number": "LT0000000000000222"})) -> Organization:
-    return None
-
-
-@app.post("/organizations/{organization_id}/add_working_hours", tags=["manage_organizations"], response_model=Organization)
-async def organization_add_opening_time(note: str = Body({"opening": 10, "closing": 22})) -> Organization:
-    return None
-
-
 @app.delete("/organizations/{organization_id}", tags=["manage_organizations"])
-async def delete_response():
-    return None
-
-
-@app.post("/organizations/{organization_id}/employees", tags=["manage_staff"], response_model=EmployeeOrganizations)
-async def staff_add_employee(note: str = Body({"id": 1, "user_id": 15, "org_id": 1337, "access": {"access1": True, "access2": False}})) -> Organization:
+async def delete_organization():
     return None
 
 
 @app.delete("/organizations/{organization_id}/employees/{user_id}", tags=["manage_staff"])
-async def delete_response():
-    return None
-
-
-@app.post("/organizations/{organization_id}/shifts", tags=["manage_shifts"], response_model=Shifts)
-async def shifts_add_shift(note: str = Body({"id": 1, "emp_org_id": 55, "start_time": "2008-09-15T15:53:00+05:00", "end_time": "2008-10-15T15:53:00+05:00", "created_timestamp": "2007-09-15T15:53:00+05:00"})) -> Organization:
+async def delete_employee():
     return None
 
 
