@@ -5,10 +5,8 @@ from model import *
 
 api_router = APIRouter()
 
-endpoints = [customer, organization]
-
-for endpoint in endpoints:
-    api_router.include_router(endpoint.router)
+api_router.include_router(customer.router)
+api_router.include_router(organization.router)
 
 app = FastAPI()
 
