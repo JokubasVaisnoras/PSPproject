@@ -53,6 +53,8 @@ class Service(BaseModel):
     description: str
     created_timestamp: int
     available: bool
+    # Not provided:
+    loyalty_point_reward: int
 
 
 class EmployeeOrganization(BaseModel):
@@ -76,6 +78,9 @@ class OrderedService(BaseModel):
     order_id: int
     service_id: int
     created_timestamp: int
+    # Not provided:
+    estimated_finish_time: datetime.datetime
+    paid: bool
 
 
 class Discount(BaseModel):

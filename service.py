@@ -30,3 +30,8 @@ async def search_services(name: str) -> list[Service]:
 @router.put("/{service_id}/reserve", response_model=OrderedService)
 async def reserve_service() -> OrderedService:
     return None
+
+
+@router.put("/{service_id}/setLoyaltyPointReward", response_model=OrderedService)
+async def set_loyalty_point_reward() -> OrderedService:
+    return None
