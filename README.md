@@ -1,5 +1,10 @@
 # PSPproject
 
+## Documentation
+
+Auto generated documentation which can be plugged into online swagger
+editors is in api_documentation.json
+
 ## Docker
 
 Build and tag the image:
