@@ -21,24 +21,23 @@ docker run -p8000:8000 psp
 
 ## Without Docker
 
-Start with:
-
-windows users:
-Reccomend to use venv(virtual environment)
+Recommend to use venv (virtual environment)
 python3 keyword may be different on your device
+Python 3.11 recommended
+
+Install the dependencies:
 
 ```
-python3 -m pip install uvicorn
-python3 -m pip install fastapi
-python3 -m pip install pydantic
+python3 -m pip install -r requirements.txt
+```
+
+Start the application:
+
+```
 python3 -m uvicorn main:app
 ```
 
-Linux users:
-
-```
-uvicorn main:app
-```
+## Documentation portals
 
 Available from:
 
