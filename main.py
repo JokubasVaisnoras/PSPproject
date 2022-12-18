@@ -3,6 +3,7 @@ import customer
 import organization
 import database
 import menu
+import products
 from model import *
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String
@@ -18,6 +19,7 @@ api_router.include_router(organization.router)
 
 
 api_router.include_router(menu.router)
+api_router.include_router(products.router)
 
 app = FastAPI()
 

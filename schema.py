@@ -25,3 +25,31 @@ class MenuGetPaginated(BaseModel):
     totalPages: int
     items: List[Menu]
 ##
+
+## Products
+class MeasuringTypeEnum(str, Enum):
+    kg = "kg"
+    g = "g"
+    l = "l"
+    ml = "ml"
+    unit = "unit"
+class ProductBase(BaseModel):
+    name: str
+    measuringType: MeasuringTypeEnum
+    amount: int
+    price: float
+
+    
+class ProductCreate(ProductBase):
+    pass
+class Product(ProductBase):
+    id: uuid.UUID
+    restaurantId: uuid.UUID
+    class Config:
+        orm_mode = True
+
+class ProductGetPaginated(BaseModel):
+    totalPages: int
+    items: List[Product]
+
+
