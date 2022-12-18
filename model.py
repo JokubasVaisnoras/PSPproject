@@ -1,11 +1,12 @@
 from pydantic import BaseModel
-from enum import Enum
 import datetime
 import database
 import uuid
+import enum
+import schema
 
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime, Enum
 
 
 class Menu(database.Base):
@@ -16,9 +17,33 @@ class Menu(database.Base):
     restaurantId = Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
     name = Column(String)
 
+ 
+class Order_Item(database.Base):
+    __tablename__ = "order_item"
+
+    id = Column(UUID(as_uuid=True), primary_key=True,
+                index=True, default=uuid.uuid4)
+    orderId = Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
+    menuItem = Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
+    quantity = Column(Integer)
+    status = Column(Enum(schema.OrderItemStatusEnum))
+    comment = Column(String)
+    startDate = Column(DateTime(timezone=True))
+    endDate = Column(DateTime(timezone=True))
+
+    #     id = order.id
+    #     orderId = 
+    #     menuItemId = 
+    #     quantity = 
+    #     status = 
+    #     comment = 
+    #     startDate = 
+    #     endDate = 
+        
+
 
 # OLD !!!!!!!!!!!!!!!!!!!!!!!!
-class TransactionType(Enum):
+class TransactionType(enum.Enum):
     cash = "cash"
     card = "card"
 
