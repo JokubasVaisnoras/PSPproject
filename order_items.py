@@ -4,17 +4,138 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 import datetime
 import database
 import uuid
+import re
+from dateutil import parser
 
 router = APIRouter(
     prefix="/order-items",
     tags=["order-items"]
 )
+def filterStatus(orders:list[model.Order_Item], status: str):
+    newList = []
+    print(orders)
+    for order in orders:
+        print("order",order, "order status:",order.status.value)
+        if status == order.status.value:
+            newList.append(order)
+            print(order)
+    return newList
+
+def filterStartDate(orders:list[model.Order_Item], query: str, onlyDate: datetime.datetime, date:str):
+    # number = int(''.join(c for c in query if c.isdigit()))
+
+    newList = []
+    if ">" in query:
+        if "=" in query:
+            for order in orders:
+                if order.startDate.timestamp() >= onlyDate:
+                    newList.append(order)
+        else:
+            for order in orders:
+                if order.startDate.timestamp() > onlyDate:
+                    newList.append(order)
+    elif "<" in query:
+        if "=" in query:
+            for order in orders:
+                if order.startDate.timestamp() <= onlyDate:
+                    newList.append(order)
+        else:
+            for order in orders:
+                if order.startDate.timestamp() < onlyDate:
+                    newList.append(order)
+    elif "=" in query:
+        for order in orders:
+            if order.startDate.timestamp() == onlyDate :
+                newList.append(order)
+    return newList
+
+def filterEndDate(orders:list[model.Order_Item], query: str, onlyDate: datetime.datetime, date:str):
+    # number = int(''.join(c for c in query if c.isdigit()))
+
+    newList = []
+    if ">" in query:
+        if "=" in query:
+            for order in orders:
+                if order.endDate.timestamp() >= onlyDate:
+                    newList.append(order)
+        else:
+            for order in orders:
+                if order.endDate.timestamp() > onlyDate:
+                    newList.append(order)
+    elif "<" in query:
+        if "=" in query:
+            for order in orders:
+                if order.endDate.timestamp() <= onlyDate:
+                    newList.append(order)
+        else:
+            for order in orders:
+                if order.endDate.timestamp() < onlyDate:
+                    newList.append(order)
+    elif "=" in query:
+        for order in orders:
+            if order.endDate.timestamp() == onlyDate :
+                newList.append(order)
+    return newList
+
+# def filterPrice(orders: list[model.Order_Item], query: str) -> list[model.Order_Item]:
+#     number = float(re.sub("[^\d\.]", "", query))
+#     newList = []
+#     if ">" in query:
+#         if "=" in query:
+#             for order in orders:
+#                 if order.price >= number:
+#                     newList.append(order)
+#         else:
+#             for order in orders:
+#                 if order.price > number:
+#                     newList.append(order)
+#     elif "<" in query:
+#         if "=" in query:
+#             for order in orders:
+#                 if order.price <= number:
+#                     newList.append(order)
+#         else:
+#             for order in orders:
+#                 if order.price < number:
+#                     newList.append(order)
+#     elif "=" in query:
+#         for order in orders:
+#                 if order.price == number:
+#                     newList.append(order)
+#     return newList
 
 
 
 @router.get("/restaurant/{restaurantId}/paginated", response_model=schema.OrderItemWithId)
-def get_order_paginated(restaurantId: uuid.UUID, status: str | None = None,startDate: datetime.datetime | None = None, endDate: datetime.datetime | None = None, page: int | None = None, db: database.SessionLocal = Depends(database.get_db)):
+def get_order_paginated(restaurantId: uuid.UUID, status: str | None = None,startDate: str | None = None, endDate: str | None = None, page: int | None = None, db: database.SessionLocal = Depends(database.get_db)):
+    arguments = locals()
     order = db.query(model.Order_Item).all()
+    
+    for arg in arguments.items():
+        if arg[1] != None:
+            if arg[0] == 'status':
+                order = filterStatus(orders=order, status=status)
+            if arg[0] == 'startDate':
+                startDateCopy = startDate
+                # pattern = re.compile("[=<>]")
+                # if(pattern.match(startDateCopy)):
+                #     raise HTTPException(status_code=400, detail="Bad parameters")
+                onlyDate = re.split(r"[=<>]", startDate)
+                date = parser.parse(onlyDate[1])
+                date = date.timestamp()
+                order = filterStartDate(orders=order, query=startDate, onlyDate=date, date='startDate')
+            if arg[0] == 'endDate':
+                dateCopy = startDate
+                # pattern = re.compile("[=<>]")
+                # if(pattern.match(dateCopy)):
+                #     raise HTTPException(status_code=400, detail="Bad price parameters")
+                onlyDate = re.split(r"[=<>]", startDate)
+                date = parser.parse(onlyDate[1])
+                date = date.timestamp()
+                order = filterEndDate(orders=order, query=endDate, onlyDate=date, date='endDate')
+            if arg[0] == 'page':
+                if page != 1:
+                    order = []
     return schema.OrderItemWithId(totalPages=1, id=restaurantId, items=order)
 
 
