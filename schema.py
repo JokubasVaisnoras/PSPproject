@@ -59,6 +59,26 @@ class OrderItemCreate(OrderItem):
     pass
 
 
-# class OrderItemWithId(BaseModel):
+## menu-items
+class MenuItemStateEnum(Enum):
+    inStock = "In Stock"
+    outOfStock = "Out Of Stock"
+
+class MenuItem(BaseModel):
+    recipeId: uuid.UUID
+    description: str
+    photo: str
+    cookingDescription: str
+    state: MenuItemStateEnum
+    defaultDiscount: float
+    loyaltyDiscount: float
+    price: float
+    class Config:
+        orm_mode = True
+class MenuItemModel(BaseModel):
+    items:MenuItem
+
+class MenuItemWithId(MenuItem):
+    id: uuid.UUID
 
 

@@ -6,7 +6,7 @@ import enum
 import schema
 
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, Integer, String, DateTime, Enum
+from sqlalchemy import Column, Integer, String, DateTime, Enum, Float
 
 
 class Menu(database.Base):
@@ -31,14 +31,20 @@ class Order_Item(database.Base):
     startDate = Column(DateTime(timezone=True))
     endDate = Column(DateTime(timezone=True))
 
-    #     id = order.id
-    #     orderId = 
-    #     menuItemId = 
-    #     quantity = 
-    #     status = 
-    #     comment = 
-    #     startDate = 
-    #     endDate = 
+class MenuItem(database.Base):
+    __tablename__ = "menu_item"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True,
+            index=True, default=uuid.uuid4)
+    recipeId = Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
+    description = Column(String)
+    photo = Column(String)
+    cookingDescription = Column(String)
+    state = Column(Enum(schema.MenuItemStateEnum))
+    defaultDiscount = Column(Float)
+    loyaltyDiscount = Column(Float)
+    price = Column(Float)
+
         
 
 

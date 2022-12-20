@@ -2,7 +2,7 @@ from fastapi import APIRouter, FastAPI, Depends, HTTPException
 import customer
 import organization
 import database
-import menu, order_items
+import menu, order_items, menu_items
 from model import *
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String
@@ -19,6 +19,7 @@ api_router.include_router(organization.router)
 
 api_router.include_router(menu.router)
 api_router.include_router(order_items.router)
+api_router.include_router(menu_items.router)
 
 app = FastAPI()
 
