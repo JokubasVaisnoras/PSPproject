@@ -109,7 +109,7 @@ def filterEndDate(orders:list[model.Order_Item], query: str, onlyDate: datetime.
 @router.get("/restaurant/{restaurantId}/paginated", response_model=schema.OrderItemWithId)
 def get_order_paginated(restaurantId: uuid.UUID, status: str | None = None,startDate: str | None = None, endDate: str | None = None, page: int | None = None, db: database.SessionLocal = Depends(database.get_db)):
     arguments = locals()
-    order = db.query(model.Order_Item).all()
+    order = db.query(model.Order_Item).filter(model.Order_Item.id == restaurantId).all()
     
     for arg in arguments.items():
         if arg[1] != None:
@@ -159,8 +159,10 @@ def patch_menu(orderItemId:uuid.UUID, status:str, db: database.SessionLocal = De
 
 @router.get("/{orderItemId}", response_model=schema.OrderItemWithId)
 def get_order(orderItemId: uuid.UUID, db: database.SessionLocal = Depends(database.get_db)):
-    order = db.query(model.Order_Item).filter(model.Order_Item.orderId == orderItemId)
-    return schema.OrderItem(items=order)
+    # order = db.query(model.Order_Item).filter(model.Order_Item.orderId == orderItemId)
+    order = db.query(model.Order_Item).filter(model.Order_Item.id == orderItemId).all()
+
+    return schema.OrderItemWithId(items=order, totalPages=1)
 
 @router.put("/{orderItemId}",status_code=204)
 def put_order_item(orderItemId: uuid.UUID, info: schema.OrderItemCreate,  db: database.SessionLocal = Depends(database.get_db)):
