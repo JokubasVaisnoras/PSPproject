@@ -6,7 +6,7 @@ import database
 import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import Column, Integer, String, Enum, Float
+from sqlalchemy import Column, Integer, String, Enum, Float, DateTime
 
 
 class Menu(database.Base):
@@ -37,6 +37,28 @@ class Product(database.Base):
     amount = Column(Integer)
     price = Column(Float)
 
+class Payment(database.Base):
+    __tablename__ = "payments"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True,
+                index=True, default=uuid.uuid4)
+    orderId = Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
+    price = Column(Float)
+    taxAmount = Column(Float)
+    tips = Column(Float)
+    cardId = Column(String)
+    paymentType = Column(String)
+    paymentDate = Column(DateTime(timezone=True))
+
+class Recipe(database.Base):
+    __tablename__ = "recipes"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True,
+                index=True, default=uuid.uuid4)
+    productId = Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
+    menuItemId = Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
+    amount = Column(Float)
+    measuringType = Column(Enum(MeasuringTypeEnum))
 
 # OLD !!!!!!!!!!!!!!!!!!!!!!!!
 class TransactionType(str, Enum):

@@ -52,4 +52,35 @@ class ProductGetPaginated(BaseModel):
     totalPages: int
     items: List[Product]
 
+class PaymentBase(BaseModel):
+    price: float
+    taxAmount: float
+    tips: float
+    cardId: str
+    paymentType: str
+    paymentDate: datetime.datetime
 
+class PaymentWithId(PaymentBase):
+    id: uuid.UUID
+class Payment(PaymentWithId):
+    orderId: uuid.UUID
+    class Config:
+        orm_mode = True
+
+class PaymentCreate(PaymentBase):
+    pass
+
+class RecipeBase(BaseModel):
+    productId: uuid.UUID
+    amount: float
+    measuringType: MeasuringTypeEnum
+
+class RecipeWithId(RecipeBase):
+    menuItemId: uuid.UUID
+class Recipe(RecipeWithId):
+    id: uuid.UUID
+    class Config:
+        orm_mode = True
+
+class RecipeCreate(RecipeBase):
+    pass

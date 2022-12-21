@@ -85,7 +85,7 @@ async def get_product(restaurantId: uuid.UUID, name: str | None = None, measurin
 price: str | None = None, page: int | None = None, db: database.SessionLocal = Depends(database.get_db)):
     arguments = locals()
         
-    products = db.query(model.Product).all()
+    products = db.query(model.Product).filter(model.Product.restaurantId == restaurantId).all()
     
     for arg in arguments.items():
         if arg[1] != None:
@@ -97,13 +97,13 @@ price: str | None = None, page: int | None = None, db: database.SessionLocal = D
                 amountCopy = amount
                 pattern = re.compile("/(=|>|<|>=|<|<=|<>)\d+")
                 if(pattern.match(amountCopy)):
-                    raise HTTPException(status_code=400, detail="Bad amount parameters")
+                    raise HTTPException(status_code=400, detail="Bad parameters")
                 products = filterAmount(products=products, query=amount)
             if arg[0] == 'price':
                 priceCopy = price
                 pattern = re.compile("/(=|>|<|>=|<|<=|<>)\d+")
                 if(pattern.match(priceCopy)):
-                    raise HTTPException(status_code=400, detail="Bad price parameters")
+                    raise HTTPException(status_code=400, detail="Bad parameters")
                 products = filterPrice(products=products, query=price)
             if arg[0] == 'page':
                 if page != 1:
@@ -113,7 +113,7 @@ price: str | None = None, page: int | None = None, db: database.SessionLocal = D
 
 
 @router.post("/restaurant/{restaurantId}", response_model=schema.Product)
-def create_menu(restaurantIdPar: uuid.UUID, product: schema.ProductCreate, db: database.SessionLocal = Depends(database.get_db)):
+def create_product(restaurantIdPar: uuid.UUID, product: schema.ProductCreate, db: database.SessionLocal = Depends(database.get_db)):
     db_product = model.Product(restaurantId=restaurantIdPar, name=product.name, measuringType=product.measuringType, amount=product.amount, price=product.price)
     db.add(db_product)
     db.commit()
@@ -121,28 +121,25 @@ def create_menu(restaurantIdPar: uuid.UUID, product: schema.ProductCreate, db: d
     return db_product
 
 
-# @router.put("/{productId}", tags=["products"], status_code=204)
-# async def put_product(productId: str, product: Product):
-#     return None #204
+@router.put("/{productId}",status_code=204)
+def put_product(productId: uuid.UUID, info: schema.ProductBase,  db: database.SessionLocal = Depends(database.get_db)):
+    db_info = db.query(model.Product).filter(model.Product.id == productId).first()
+    if db_info is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    db_info.name = info.name
+    db_info.measuringType = info.measuringType
+    db_info.amount = info.amount
+    db_info.price = info.price
+    # db.add(db_info)s
+    db.commit()
 
+    return Response(status_code=204)
 
-
-
-# @router.post("/addWorkingHours", tags=["Organizations"], response_model=Organization)
-# async def add_opening_time(note: str = Body({"opening": 10, "closing": 22})) -> Organization:
-#     return None
-
-
-# @router.delete("/", tags=["Organizations"], status_code=204)
-# async def delete_organization():
-#     return None
-
-
-# @router.get("/order_history", tags=["Organizations"], response_model=list[Order])
-# async def get_order_history(organization_id: int) -> list[Order]:
-#     return None
-
-
-# @router.get("/order_history/{employee_id}", tags=["Organizations"], response_model=list[Order])
-# async def get_employee_order_history(organization_id: int, employee_id: int) -> list[Order]:
-#     return None
+@router.delete("/{productId}", status_code=204)
+def delete_product(productId: uuid.UUID, db: database.SessionLocal = Depends(database.get_db)):
+    db_info = db.query(model.Product).filter(model.Product.id == productId).first()
+    if db_info is None:
+        return Response(status_code=500)
+    db.delete(db_info)
+    db.commit()
+    return Response(status_code=204)
