@@ -18,7 +18,6 @@ class Menu(database.Base):
     name = Column(String)
 
 
-<<<<<<< HEAD
 class EmployeePositionEnum(enum.StrEnum):
     Waiter = "Waiter"
     Chef = "Chef"
@@ -49,7 +48,7 @@ class Shift(database.Base):
     endTime = Column(DateTime(timezone=True))
     date = Column(Date)
 
- 
+
 class Order_Item(database.Base):
     __tablename__ = "order_item"
 
@@ -66,9 +65,9 @@ class Order_Item(database.Base):
 
 class MenuItem(database.Base):
     __tablename__ = "menu_item"
-    
+
     id = Column(UUID(as_uuid=True), primary_key=True,
-            index=True, default=uuid.uuid4)
+                index=True, default=uuid.uuid4)
     recipeId = Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
     description = Column(String)
     photo = Column(String)
