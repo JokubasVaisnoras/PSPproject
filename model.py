@@ -2,6 +2,8 @@ from enum import Enum
 import enum
 import database
 import uuid
+import enum
+import schema
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Column, Integer, String, Enum, Float, DateTime, Date
@@ -16,6 +18,7 @@ class Menu(database.Base):
     name = Column(String)
 
 
+<<<<<<< HEAD
 class EmployeePositionEnum(enum.StrEnum):
     Waiter = "Waiter"
     Chef = "Chef"
@@ -45,6 +48,35 @@ class Shift(database.Base):
     startTime = Column(DateTime(timezone=True))
     endTime = Column(DateTime(timezone=True))
     date = Column(Date)
+
+ 
+class Order_Item(database.Base):
+    __tablename__ = "order_item"
+
+    id = Column(UUID(as_uuid=True), primary_key=True,
+                index=True, default=uuid.uuid4)
+    orderId = Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
+    menuItem = Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
+    quantity = Column(Integer)
+    status = Column(Enum(schema.OrderItemStatusEnum))
+    comment = Column(String)
+    startDate = Column(DateTime(timezone=True))
+    endDate = Column(DateTime(timezone=True))
+
+
+class MenuItem(database.Base):
+    __tablename__ = "menu_item"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True,
+            index=True, default=uuid.uuid4)
+    recipeId = Column(UUID(as_uuid=True), index=True, default=uuid.uuid4)
+    description = Column(String)
+    photo = Column(String)
+    cookingDescription = Column(String)
+    state = Column(Enum(schema.MenuItemStateEnum))
+    defaultDiscount = Column(Float)
+    loyaltyDiscount = Column(Float)
+    price = Column(Float)
 
 
 class MeasuringTypeEnum(enum.StrEnum):
