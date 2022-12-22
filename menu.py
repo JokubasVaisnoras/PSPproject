@@ -14,7 +14,8 @@ router = APIRouter(
 # Page currently ignored
 @router.get("/restaurant/{restaurantId}/paginated", response_model=schema.MenuGetPaginated)
 def get_menus_paginated(restaurantId: uuid.UUID, page: int, db: database.SessionLocal = Depends(database.get_db)):
-    menus = db.query(model.Menu).all()
+    menus = db.query(model.Menu).filter(
+        model.Menu.restaurantId == restaurantId).all()
     return schema.MenuGetPaginated(totalPages=1, items=menus)
 
 
@@ -40,10 +41,9 @@ def update_menu(menuId: uuid.UUID, menu: schema.MenuCreate, db: database.Session
 
 
 @router.delete("/{menuId}", status_code=204)
-def update_menu(menuId: uuid.UUID, menu: schema.MenuCreate, db: database.SessionLocal = Depends(database.get_db)):
+def update_menu(menuId: uuid.UUID, db: database.SessionLocal = Depends(database.get_db)):
     db_menu = db.query(model.Menu).filter(model.Menu.id == menuId).first()
-    if db_menu is None:
-        return Response(status_code=204)
-    db.delete(db_menu)
-    db.commit()
+    if db_menu is not None:
+        db.delete(db_menu)
+        db.commit()
     return Response(status_code=204)

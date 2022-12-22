@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import psycopg2
+import psycopg2  # Do not delete this
 
 engine = create_engine(
     "postgresql+psycopg2://user:password@postgresql:5432")

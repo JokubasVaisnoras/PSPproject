@@ -1,12 +1,12 @@
-from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI
 import database
 import menu
 import products
 import payments
 import recipe
+import employee
+import shift
 from model import *
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import sessionmaker
 
 database.Base.metadata.create_all(bind=database.engine)
 
@@ -16,6 +16,8 @@ api_router.include_router(menu.router)
 api_router.include_router(products.router)
 api_router.include_router(payments.router)
 api_router.include_router(recipe.router)
+api_router.include_router(employee.router)
+api_router.include_router(shift.router)
 
 app = FastAPI()
 
