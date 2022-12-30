@@ -4,6 +4,89 @@ from typing import List
 import datetime
 import uuid
 
+#Notifications
+#--------------------
+class NotificationText(BaseModel):
+    content:str
+
+class NotificationWithReceiver(BaseModel):
+    id: uuid.UUID
+    sender: uuid.UUID
+    content: str
+    timestamp: datetime.datetime
+    receiver: uuid.UUID
+
+    class Config:
+        orm_mode = True
+
+class NotificationResponse(BaseModel):
+    content: str
+    sender: uuid.UUID
+    receiver: uuid.UUID
+
+class NotificationWithoutReceiver(BaseModel):
+    id: uuid.UUID
+    sender: uuid.UUID
+    content: str
+    timestamp: datetime.datetime
+
+    class Config:
+        orm_mode = True
+
+class NotificationPaginated(BaseModel):
+    totalPages: int
+    items: List[NotificationWithoutReceiver]
+#--------------------
+
+#Tables
+#--------------------
+class TableStatusEnum(Enum):
+    In_use = "In use"
+    Free = "Free"
+
+class Table(BaseModel):
+    id: uuid.UUID
+    waiterId: uuid.UUID
+    seats: int
+    status: TableStatusEnum
+
+    class Config:
+        orm_mode = True
+
+class TablePaginated(BaseModel):
+    totalPages: int
+    items: List[Table]
+#--------------------
+
+#Orders
+#--------------------
+class OrderTypeEnum(Enum):
+    EatingIn = "Eating in"
+    Takeaway = "Takeaway"
+    PartnerTakeaway = "PartnerTakeaway"
+
+class TaxTypeEnum(Enum):
+    max_tax = 0.21
+    min_tax = 0.07
+    no_tax = 0
+
+class Order(BaseModel):
+    tableId: uuid.UUID
+    cashierId: uuid.UUID
+    partnerId: uuid.UUID
+    orderType: OrderTypeEnum
+    totalPrice: float
+    taxType: TaxTypeEnum
+    date: datetime.datetime
+    tips: float
+
+    class Config:
+        orm_mode = True
+
+class OrderListed(BaseModel):
+    order: List[Order]
+#--------------------
+
 
 # Menu
 class MenuBase(BaseModel):

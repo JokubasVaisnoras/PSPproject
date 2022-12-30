@@ -8,6 +8,57 @@ import schema
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Column, Integer, String, Enum, Float, DateTime, Date
 
+# Notifications
+#-----------------------
+class Notification(database.Base):
+    __tablename__= "notification"
+
+    id = Column(UUID(as_uuid=True), primary_key=True,
+                index=True, default=uuid.uuid4)
+    sender = Column(UUID(as_uuid=True),
+                index=True, default=uuid.uuid4)
+    content = Column(String)
+    timestamp = Column(DateTime(timezone=True))
+    receiver = Column(UUID(as_uuid=True),
+                index=True, default=uuid.uuid4)
+
+#-----------------------
+
+# Tables
+#-----------------------
+
+class Table(database.Base):
+    __tablename__= "table"
+
+    id = Column(UUID(as_uuid=True), primary_key=True,
+                index=True, default=uuid.uuid4)
+    waiterId = Column(UUID(as_uuid=True),
+                index=True, default=uuid.uuid4)
+    seats = Column(Integer)
+    status = Column(Enum(schema.TableStatusEnum))
+
+#-----------------------
+
+# Orders
+#-----------------------
+class Order(database.Base):
+    __tablename__= "order"
+
+    orderId = Column(UUID(as_uuid=True), primary_key=True,
+                index=True, default=uuid.uuid4)
+    tableId = Column(UUID(as_uuid=True),
+                index=True, default=uuid.uuid4)
+    cashierId = Column(UUID(as_uuid=True),
+                index=True, default=uuid.uuid4)
+    partnerId = Column(UUID(as_uuid=True),
+                index=True, default=uuid.uuid4)
+    orderType = Column(Enum(schema.OrderTypeEnum))
+    totalPrice = Column(Float)
+    taxType = Column(Enum(schema.TaxTypeEnum))
+    date = Column(DateTime(timezone=True))
+    tips = Column(Float)
+
+#-----------------------
 
 class Menu(database.Base):
     __tablename__ = "menu"
