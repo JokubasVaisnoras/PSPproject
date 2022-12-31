@@ -3,9 +3,19 @@
 ## Documentation
 
 Auto generated documentation which can be plugged into online swagger
-editors is in api_documentation.json
+editor is in a file: api_documentation.json
 
-## Docker Compose
+We implemented all API endpoints, however we did not find it necessary to implement all the features in the endpoints.
+For example, we didn't include pagination, it only works if we put in number 1. Also, querying in specific endpoints was simplified, because we did not find it important and useful enough.
+
+
+## Starting the API with Docker
+
+* Install docker: https://docs.docker.com/get-docker/
+
+* Run docker
+
+* Go to PSPproject
 
 Start containers:
 
@@ -13,7 +23,14 @@ Start containers:
 docker compose up --build
 ```
 
-## Docker
+Open API with these links:
+
+```
+localhost:8000/docs
+localhost:8000/redoc
+```
+
+## Optional Docker commands
 
 Build and tag the image:
 
