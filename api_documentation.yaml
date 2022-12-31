@@ -1,0 +1,1546 @@
+openapi: 3.0.0
+
+info:
+  version: 1.1.0
+  title: Point of Sale system (Team KAVA)
+  description: 'The following document provides the documentation for a PoS system for cafes and restaurants as described in documentation by Team Skestam Kartu'
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/TEAMKAVA2_1/PSP_API_Documentation_Team_Kava/1.1.0
+
+tags:
+  - name: products
+  - name: recipes
+  - name: order-items
+  - name: menu-items
+  - name: notifications
+  - name: employees
+  - name: orders
+  - name: tables
+  - name: payments
+  - name: menus
+  - name: shifts
+
+paths:
+  /menu-items/{menuItemId}/recipe:
+    get:
+      tags:
+        - recipes
+      summary: Returns menu item's recipe
+      description: Returns menu item's recipe which contains list of products and their amounts
+      parameters:
+        - in: path
+          name: menuItemId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags:
+        - recipes
+      summary: Creates recipe for menu item
+      parameters:
+        - in: path
+          name: menuItemId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Recipe'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipeWithId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    put:
+      tags:
+        - recipes
+      summary: Updates single menu item recipe
+      description: Replaces menu item recipe with request body recipe
+      parameters:
+        - in: path
+          name: menuItemId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Recipe'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags:
+        - recipes
+      summary: Deletes menu item recipe
+      parameters:
+        - in: path
+          name: menuItemId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '204':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /order-items/restaurant/{restaurantId}/paginated:
+    get:
+      tags:
+        - order-items
+      summary: Returns paginated and filtered restaurant order items
+      parameters:
+        - in: path
+          name: restaurantId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/OrderItemStatusEnum'
+        - in: query
+          name: startDate
+          description: Date is less than (or equal to), more than (or equal to) or equal to input
+          schema:
+            $ref: '#/components/schemas/EqualityPattern'
+        - in: query
+          name: endDate
+          description: Date is less than (or equal to), more than (or equal to) or equal to input
+          schema:
+            $ref: '#/components/schemas/EqualityPattern'
+        - in: query
+          name: page
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPages:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderItemWithId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /order-items/restaurant/{restaurantId}:
+    post:
+      tags:
+        - order-items
+      summary: Creates order item for restaurant
+      parameters:
+        - in: path
+          name: restaurantId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderItem'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderItemWithId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /order-items/{orderItemId}/status:
+    patch:
+      tags:
+        - order-items
+      summary: Changes item status in order
+      operationId: changeItemStatusInOrder
+      parameters:
+        - in: path
+          name: orderItemId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/OrderItemStatusEnum'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /products/restaurant/{restaurantId}/paginated:
+    get:
+      tags:
+        - products
+      summary: Returns paginated and filtered restaurant products
+      parameters:
+        - in: path
+          name: restaurantId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+        - in: query
+          name: name
+          description: Name contains input
+          schema:
+            type: string
+        - in: query
+          name: measuringType
+          schema:
+            $ref: '#/components/schemas/MeasuringTypeEnum'
+        - in: query
+          name: amount
+          description: Amount is less than (or equal to), more than (or equal to) or equal to input
+          schema:
+            $ref: '#/components/schemas/EqualityPattern'
+        - in: query
+          name: price
+          description: Price is less than (or equal to), more than (or equal to) or equal to input
+          schema:
+            $ref: '#/components/schemas/EqualityPattern'
+        - in: query
+          name: page
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPages:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductWithId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /products/restaurant/{restaurantId}:
+    post:
+      tags:
+        - products
+      summary: Creates new product for restaurant
+      parameters:
+        - in: path
+          name: restaurantId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductWithIdAndRestaurantId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /products/{productId}:
+    put:
+      tags:
+        - products
+      summary: Updates single product
+      description: Updates single product and leaves null for unspecified fields
+      parameters:
+        - in: path
+          name: productId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags:
+        - products
+      summary: Deletes single product
+      parameters:
+        - in: path
+          name: productId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /notifications/{employeeId}/paginated:
+    get:
+      tags:
+        - notifications
+      summary: Returns paginated employee notifications
+      operationId: getEmployeeNotifications
+      parameters:
+        - in: path
+          name: employeeId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+        - in: query
+          name: page
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPages:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /notifications/{employeeId}:
+    post:
+      tags:
+        - notifications
+      summary: Sends employee a notification
+      description: Restaurant employee can send a notification to a co-worker
+      operationId: sendEmployeeNotification
+      parameters:
+        - in: path
+          name: employeeId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  example: A new order has been created.
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationWithReceiver'
+        '400':
+          description: User tries to send data to self
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /employees/restaurant/{restaurantId}:
+    post:
+      tags:
+        - employees
+      summary: Creates employee for restaurant
+      parameters: 
+        - in: path
+          name: restaurantId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Employee'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeWithId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /orders:
+    post:
+      tags:
+        - orders
+      summary: Creates order for table or partner
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderWithId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /orders/{orderId}:
+    get:
+      tags:
+        - orders
+      summary: Returns single order
+      parameters:
+        - in: path
+          name: orderId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    put:
+      tags:
+        - orders
+      summary: Updates single order
+      description: Updates single order and leaves null for unspecified fields
+      parameters:
+        - in: path
+          name: orderId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags:
+        - orders
+      summary: Deletes single order
+      parameters:
+        - in: path
+          name: orderId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /tables/restaurant/{restaurantId}/paginated:
+    get:
+      tags:
+        - tables
+      summary: Returns paginated restaurant tables
+      parameters:
+        - in: path
+          name: restaurantId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+        - in: query
+          name: page
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPages:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TableWithId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /tables/restaurant/{restaurantId}:
+    post:
+      tags:
+        - tables
+      summary: Creates table for restaurant
+      parameters:
+        - in: path
+          name: restaurantId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Table'
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TableWithId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /tables/{tableId}:
+    put:
+      tags:
+        - tables
+      summary: Updates single table
+      description: Updates single table and leaves null for unspecified fields
+      parameters:
+        - in: path
+          name: tableId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/Table'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags:
+        - tables
+      summary: Deletes single table
+      parameters:
+        - in: path
+          name: tableId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /tables/{tableId}/status:
+    patch:
+      tags:
+        - tables
+      summary: Changes single table's status
+      operationId: changeTableStatus
+      parameters:
+        - in: path
+          name: tableId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  $ref: '#/components/schemas/TableStatusEnum'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /order-items/{orderItemId}:
+    get:
+      tags:
+        - order-items
+      summary: Returns single order item
+      parameters:
+        - in: path
+          name: orderItemId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    put:
+      tags:
+        - order-items
+      summary: Updates single order item
+      description: Updates single order item and leaves null for unspecified fields
+      parameters:
+        - in: path
+          name: orderItemId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderItem'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags:
+        - order-items
+      summary: Deletes single order item
+      parameters:
+        - in: path
+          name: orderItemId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /menu-items/menu/{menuId}/paginated:
+    get:
+      tags:
+        - menu-items
+      summary: Returns paginated and filtered items of single menu
+      parameters:
+        - in: path
+          name: menuId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+        - in: query
+          name: name
+          description: Name contains input
+          schema:
+            type: string
+        - in: query
+          name: state
+          schema:
+            $ref: '#/components/schemas/MenuItemStateEnum'
+        - in: query
+          name: description
+          description: Description contains input
+          schema:
+            type: string
+        - in: query
+          name: price
+          description: Price is less than (or equal to), more than (or equal to) or equal to input
+          schema:
+            $ref: '#/components/schemas/EqualityPattern'
+        - in: query
+          name: page
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPages:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MenuItemWithId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /menu-items/menu/{menuId}:
+    post:
+      tags:
+        - menu-items
+      summary: Creates single item for menu
+      parameters:
+        - in: path
+          name: menuId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuItem'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MenuItemWithId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /menu-items/{menuItemId}:
+    get:
+      tags:
+        - menu-items
+      summary: Returns single menu item
+      parameters:
+        - in: path
+          name: menuItemId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    put:
+      tags:
+        - menu-items
+      summary: Updates single menu item
+      description: Updates single menu item and leaves null for unspecified fields
+      parameters:
+        - in: path
+          name: menuItemId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuItem'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags:
+        - menu-items
+      summary: Deletes single menu item
+      parameters:
+        - in: path
+          name: menuItemId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /menus/restaurant/{restaurantId}/paginated:
+    get:
+      tags:
+        - menus
+      summary: Returns paginated restaurant menus
+      parameters:
+        - in: path
+          name: restaurantId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+        - in: query
+          name: page
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPages:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MenuWithId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /menus/restaurant/{restaurantId}:
+    post:
+      tags:
+        - menus
+      summary: Creates menu for restaurant
+      parameters:
+        - in: path
+          name: restaurantId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Menu'
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuWithId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /menus/{menuId}:
+    put:
+      tags:
+        - menus
+      summary: Updates single menu
+      description: Updates single menu and leaves null for unspecified fields
+      parameters:
+        - in: path
+          name: menuId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/Menu'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags:
+        - menus
+      summary: Deletes single menu
+      parameters:
+        - in: path
+          name: menuId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /payments/{paymentId}:
+    get:
+      tags:
+        - payments
+      summary: Returns single payment
+      parameters:
+        - in: path
+          name: paymentId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentWithId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /payments/order/{orderId}:
+    post:
+      tags:
+        - payments
+      summary: Creates payment for order
+      parameters:
+        - in: path
+          name: orderId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentWithIdAndOrderId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /shifts/employee/{employeeId}/paginated:
+    get:
+      tags:
+        - shifts
+      summary: Returns paginated employee shifts
+      parameters:
+        - in: path
+          name: employeeId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+        - in: query
+          name: page
+          schema:
+            type: number
+            default: 1
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPages:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Shift'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /shifts/employee/{employeeId}:
+    post:
+      tags:
+        - shifts
+      summary: Creates shift for employee
+      parameters:
+        - in: path
+          name: employeeId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Shift'
+      responses:
+        '200':
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShiftWithEmployeeId'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /shifts/{shiftId}:
+    put:
+      tags:
+        - shifts
+      summary: Updates single shift
+      description: Updates single shift and leaves null for unspecified fields
+      parameters:
+        - in: path
+          name: shiftId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/Shift'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags:
+        - shifts
+      summary: Deletes single shift
+      parameters:
+        - in: path
+          name: shiftId
+          schema:
+            $ref: '#/components/schemas/ExampleId'
+          required: true
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+components:
+  responses:
+    NotFound:
+      description: Specified resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: User unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: User does not have privileges, tries to access other user's/restaurant's (non-existent) data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NoContent:
+      description: Request successful or resource not found
+    BadRequest:
+      description: Invalid data provided
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+    Order:
+      type: object
+      properties:
+        tableId:
+          type: string
+          format: uuid
+        cashierId:
+          type: string
+          format: uuid
+        partnerId:
+          type: string
+          format: uuid
+        orderType:
+          type: string
+          enum: [EatingIn, Takeaway, PartnerTakeaway]
+          example: EatingIn
+        totalPrice:
+          type: number
+          minimum: 0
+          example: 100.00
+        taxType:
+          type: number
+          enum: [0.21, 0.07, 0.00]
+          example: 0.21
+        date:
+          type: string
+          format: date-time
+        tips:
+          type: number
+          minimum: 0
+          example: 10.00
+    OrderWithId:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/Order'
+    MenuItem:
+      type: object
+      properties:
+        recipeId:
+          type: string
+          format: uuid
+        description:
+          type: string
+          example: 'A very tasty dish'
+        photo:
+          type: string
+          format: binary
+        cookingDescription:
+          type: string
+          example: 'The recipe for this dish is...'
+        state:
+          $ref: '#/components/schemas/MenuItemStateEnum'
+        defaultDiscount:
+          type: number
+          example: 0.1
+        loyaltyDiscount:
+          type: number
+          example: 0.15
+        price:
+          type: number
+          example: 49.99
+    MenuItemWithId:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/MenuItem'
+    Menu:
+      type: object
+      required:
+        - id
+      properties:
+        restaurantId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: 'Meat dishes'
+    MenuWithId:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/Menu'
+    Payment:
+      type: object
+      properties:
+        price:
+          type: number
+          example: 50
+        taxAmount:
+          type: number
+          example: 10.00
+        tips:
+          type: number
+          example: 2.50
+        cardId:
+          type: string
+          description: "Last 4 digits of card"
+          example: "1234"
+        paymentType:
+          type: string
+          enum: [Cash, Card, Google_Pay, Apple_Pay, PayPal]
+          example: Cash
+        paymentDate:
+          type: string
+          format: date-time
+    PaymentWithId:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/Payment'
+    PaymentWithIdAndOrderId:
+      allOf:
+        - type: object
+          properties:
+            orderId:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/PaymentWithId'
+    Shift:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        date:
+          type: string
+          format: date
+    ShiftWithEmployeeId:
+      allOf:
+        - type: object
+          properties:
+            employeeId:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/Shift'
+    Employee:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        loginCode:
+          type: string
+          example: "jodo1234"
+        position:
+          type: string
+          enum: [Waiter, Chef, Administrator]
+        scheduleId:
+          type: string
+          format: uuid
+        salary:
+          type: number
+          example: 1400.00
+        tipsAmount:
+          type: number
+          example: 20.00
+    EmployeeWithId:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+        - $ref: "#/components/schemas/Employee"
+    Recipe:
+      type: object
+      required:
+        - productId
+      properties:
+        productId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          example: 2
+        measuringType:
+          $ref: '#/components/schemas/MeasuringTypeEnum'
+    RecipeWithId:
+      allOf:
+        - $ref: '#/components/schemas/Recipe'
+        - type: object
+          required:
+            - id
+            - menuItemId
+          properties:
+            id:
+              type: string
+              format: uuid
+            menuItemId:
+              type: string
+              format: uuid
+    OrderItem:
+      type: object
+      properties:
+        orderId:
+          type: string
+          format: uuid
+        menuItemId:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+        status:
+          $ref: '#/components/schemas/OrderItemStatusEnum'
+        comment:
+          type: number
+          example: 123.1
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+    OrderItemWithId:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/OrderItem'
+    Table:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        waiterId:
+          type: string
+          format: uuid
+        seats:
+          type: integer
+          minimum: 1
+        status:
+          $ref: '#/components/schemas/TableStatusEnum'
+    TableWithId:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/Table'
+    Notification:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        sender:
+          type: string
+          format: uuid
+        content:
+          type: string
+          example: 'A new order was created.'
+        timestamp:
+          type: string
+          format: date-time
+    NotificationWithReceiver:
+      allOf:
+        - $ref: '#/components/schemas/Notification'
+        - type: object
+          required:
+            - receiver
+          properties:
+            receiver:
+              type: string
+              format: uuid
+    MeasuringTypeEnum:
+      type: string
+      enum: ["kg", "g", "l", "ml", "unit"]
+      example: "kg"
+    OrderItemStatusEnum:
+      type: string
+      enum: ["Pending", "Making", "Delivering", "Complete"]
+      example: "Pending"
+    TableStatusEnum:
+      type: string
+      enum: ["In_use", "Free"]
+      example: "Free"
+    MenuItemStateEnum:
+      type: string
+      enum: ["In_Stock", "Out_Of_Stock"]
+      example: "In_Stock"
+    ExampleId:
+      type: string
+      format: uuid
+      example: '83ed5153-26db-4a47-8ebd-d3d2bf0c4eb8'
+    Product:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Meat"
+        measuringType:
+          $ref: '#/components/schemas/MeasuringTypeEnum'
+        amount:
+          type: number
+          example: 32.00
+        price:
+          type: number
+          example: 2.50
+    ProductWithId:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/Product'
+    ProductWithIdAndRestaurantId:
+      allOf:
+        - type: object
+          properties:
+            restaurantId:
+              type: string
+              format: uuid
+        - $ref: '#/components/schemas/ProductWithId'
+    EqualityPattern:
+      type: string
+      pattern: "^[<>]?[=]?"
+      example: ">=0"

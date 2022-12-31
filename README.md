@@ -3,7 +3,7 @@
 ## Documentation
 
 Auto generated documentation which can be plugged into online swagger
-editor is in a file: api_documentation.json
+editor is in a file: api_documentation.yaml
 
 We implemented all API endpoints, however we did not find it necessary to implement all the features in the endpoints.
 For example, we didn't include pagination, it only works if we put in number 1. Also, querying in specific endpoints was simplified, because we did not find it important and useful enough.
